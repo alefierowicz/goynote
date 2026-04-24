@@ -1,18 +1,34 @@
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.InteropServices;
 using goynote.Models.System;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
 string? connectionString = builder.Configuration.GetConnectionString("GoynoteDB");
 
-if(connectionString != null)
+builder.Services.AddDbContext<DatabaseContext>(o =>
 {
-    builder.Services.AddDbContext<DatabaseContext>(o => o.UseSqlServer(connectionString));
-}
+    bool isLocalDb = connectionString?.Contains("(localdb)", StringComparison.OrdinalIgnoreCase) ?? false;
+    bool canUseSqlServer = !string.IsNullOrEmpty(connectionString) && (!isLocalDb || RuntimeInformation.IsOSPlatform(OSPlatform.Windows));
+
+    if (canUseSqlServer)
+    {
+        o.UseSqlServer(connectionString);
+    }
+    else
+    {
+        o.UseSqlite("Data Source=goynote.db");
+    }
+});
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+    context.Database.EnsureCreated();
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

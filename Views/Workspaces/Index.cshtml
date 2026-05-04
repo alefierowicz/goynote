@@ -15,13 +15,11 @@
             </a>
         </div>
     </div>
-</div>
+    
+    <hr />
 
-<hr />
-
-<div class="container">
     @foreach (var item in Model) {
-        <div class="row mb-5">
+        <div class="row align-items-center mb-5">
             <div class="col-12 col-md-4">
                 <strong>Name:</strong><br />
                 @Html.DisplayFor(modelItem => item.Name)
@@ -31,7 +29,6 @@
                 @Html.DisplayFor(modelItem => item.Description)
             </div>
             <div class="col-12 col-md-4">
-                <strong>Actions:</strong><br />
                 <a asp-action="Edit" asp-route-id="@item.ID" class="btn btn-outline-primary btn-sm">Edit</a>
                 <a asp-action="Details" asp-route-id="@item.ID" class="btn btn-outline-info btn-sm">Details</a>
                 <a asp-action="Delete" asp-route-id="@item.ID" class="btn btn-outline-danger btn-sm">Delete</a>
@@ -39,3 +36,4 @@
         </div>
     }
 </div>
+

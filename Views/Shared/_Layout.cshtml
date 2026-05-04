@@ -16,7 +16,7 @@
             @{ var currentController = ViewContext.RouteData.Values["controller"]?.ToString(); }
             <nav class="nav flex-column">
                 <a class="nav-link @(currentController == "Home" ? "active" : "")" asp-controller="Home" asp-action="Index">Home</a>
-                <a class="nav-link @(currentController == "Workspaces" ? "active" : "")" asp-controller="Workspaces">Workspaces</a>
+                <a class="nav-link @(currentController == "Workspaces" ? "active" : "")" asp-controller="Workspaces" asp-action="Index">Workspaces</a>
                 <a class="nav-link @(currentController == "Projects" ? "active" : "")" asp-controller="Projects">Projects</a>
             </nav>
         </aside>

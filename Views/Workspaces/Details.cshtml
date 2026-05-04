@@ -1,30 +1,51 @@
-﻿@model goynote.Models.Objects.Workspace
+﻿@using goynote.Models.Objects
+@model goynote.Models.Objects.Workspace
 
 @{
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
+<div class="container">
+    <div class="row align-items-center">
+        <div class="col-md-6 text-start">
+            <h1>@Html.DisplayFor(model => model.Name)</h1>
+            <p>@Html.DisplayFor(model => model.Description)</p>
+        </div>
+        <div class="col-md-6 text-end">
+            <a asp-action="Edit" asp-route-id="@Model?.ID" class="btn btn-outline-light btn-sm">
+               Edit
+            </a>
+        </div>
+    </div>
+</div>
+
+<hr />
 
 <div>
-    <h4>Workspace</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-    </dl>
+    <div class="container">
+        <div class="row">
+            @foreach (var item in Model.Projects.Where(p => p.WorkspaceID == Model.ID)) {
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">item.Title</h5>
+                            <p class="card-text">item.Description</p>
+                            <a href="#" class="btn btn-primary">details</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.ID">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+<div style="min-height: calc(100vh - 300px);" class="d-flex flex-column">
+    <div class="flex-grow-1"></div>
+    <div class="container mb-4">
+        <div class="row justify-content-center">
+            <div class="col-md-4">
+                <a asp-action="Index" class="btn btn-outline-light btn-sm w-100">Back to List</a>
+            </div>
+        </div>
+    </div>
 </div>

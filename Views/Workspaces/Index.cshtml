@@ -4,38 +4,38 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<div class="container">
+    <div class="row align-items-center">
+        <div class="col-md-6 text-start">
+            <h1>Workspaces</h1>
+        </div>
+        <div class="col-md-6 text-end">
+            <a asp-action="Create" class="btn btn-outline-light btn-sm">
+               Add new workspace
+            </a>
+        </div>
+    </div>
+</div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
+<hr />
+
+<div class="container">
+    @foreach (var item in Model) {
+        <div class="row mb-5">
+            <div class="col-12 col-md-4">
+                <strong>Name:</strong><br />
                 @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
+            </div>
+            <div class="col-12 col-md-4">
+                <strong>Description:</strong><br />
                 @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+            </div>
+            <div class="col-12 col-md-4">
+                <strong>Actions:</strong><br />
+                <a asp-action="Edit" asp-route-id="@item.ID" class="btn btn-outline-primary btn-sm">Edit</a>
+                <a asp-action="Details" asp-route-id="@item.ID" class="btn btn-outline-info btn-sm">Details</a>
+                <a asp-action="Delete" asp-route-id="@item.ID" class="btn btn-outline-danger btn-sm">Delete</a>
+            </div>
+        </div>
+    }
+</div>

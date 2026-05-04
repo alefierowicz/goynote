@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace goynote.Models.Objects
 {
@@ -15,7 +16,7 @@ namespace goynote.Models.Objects
         [Required]
         public Guid WorkspaceID { get; set; }
 
-        [Required]
+        [ValidateNever]
         public Workspace Workspace { get; set; } = null!;
 
         public ICollection<ProjectSpecificNote> PSNotes { get; set; } = new List<ProjectSpecificNote>();

@@ -12,6 +12,9 @@
             <p>@Html.DisplayFor(model => model.Description)</p>
         </div>
         <div class="col-md-6 text-end">
+            <a asp-controller="Projects" asp-action="Create" asp-route-workspaceId="@Model.ID" class="btn btn-outline-light btn-sm">
+                Create new project
+            </a>
             <a asp-action="Edit" asp-route-id="@Model?.ID" class="btn btn-outline-light btn-sm">
                Edit
             </a>
@@ -24,12 +27,12 @@
 <div>
     <div class="container">
         <div class="row">
-            @foreach (var item in Model.Projects.Where(p => p.WorkspaceID == Model.ID)) {
+            @foreach (var item in Model?.Projects.Where(p => p.WorkspaceID == Model.ID)) {
                 <div class="col-md-4 mb-4">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">item.Title</h5>
-                            <p class="card-text">item.Description</p>
+                            <h5 class="card-title">@item.Name</h5>
+                            <p class="card-text">@item.Description</p>
                             <a href="#" class="btn btn-primary">details</a>
                         </div>
                     </div>

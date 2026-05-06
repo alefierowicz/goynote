@@ -1,4 +1,5 @@
-﻿@model goynote.Models.Objects.Workspace
+﻿@using goynote.Models.Objects
+@model goynote.Models.Objects.Workspace
 
 @{
     ViewData["Title"] = "Delete";
@@ -33,12 +34,12 @@
         <h3 class="text-lg text-danger">
             Deleting the workspace will delete ALL of the following projects:
         </h3>
-        @foreach (var item in Model.Projects.Where(p => p.WorkspaceID == Model.ID)) {
+        @foreach (var item in Model?.Projects.Where(p => p.WorkspaceID == Model.ID)) {
             <div class="col-md-4 mb-4">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">item.Title</h5>
-                        <p class="card-text">item.Description</p>
+                        <h5 class="card-title">@item.Name</h5>
+                        <p class="card-text">@item.Description</p>
                     </div>
                 </div>
             </div>

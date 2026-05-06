@@ -60,16 +60,6 @@ namespace goynote.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ID,Name,Description,WorkspaceID")] Project project)
         {
-             if (!ModelState.IsValid)
-    {
-        foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
-        {
-            Console.WriteLine(error.ErrorMessage);
-        }
-    }
-
-    Console.WriteLine($"WorkspaceID: {project.WorkspaceID}");
-    
             if (ModelState.IsValid)
             {
                 project.ID = Guid.NewGuid(); // Assign a new GUID for the project ID

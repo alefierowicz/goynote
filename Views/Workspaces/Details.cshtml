@@ -12,8 +12,11 @@
             <p>@Html.DisplayFor(model => model.Description)</p>
         </div>
         <div class="col-md-6 text-end">
+            <a asp-controller="Notes" asp-action="Create" asp-route-workspaceId="@Model.ID" class="btn btn-outline-light btn-sm">
+                New note
+            </a>
             <a asp-controller="Projects" asp-action="Create" asp-route-workspaceId="@Model.ID" class="btn btn-outline-light btn-sm">
-                Create new project
+                New project
             </a>
             <a asp-action="Edit" asp-route-id="@Model?.ID" class="btn btn-outline-light btn-sm">
                Edit
@@ -27,7 +30,7 @@
 <div>
     <div class="container">
         <div class="row">
-            @foreach (var item in Model?.Projects.Where(p => p.WorkspaceID == Model.ID)) {
+            @foreach (var item in Model.Projects.Where(p => p.WorkspaceID == Model.ID)) {
                 <div class="col-md-4 mb-4">
                     <div class="card">
                         <div class="card-body">
@@ -39,6 +42,25 @@
                 </div>
             }
         </div>
+        @{ var notes = Model.Notes.Where(n => n.WorkspaceID == Model.ID).ToList(); }
+
+        @if (notes.Any()) {
+            <hr />
+            <div class="row">
+                @foreach (var note in notes) {
+                    <div class="col-md-6 mb-4">
+                        <div class="card border-secondary">
+                            <div class="card-body">
+                                <h5 class="card-title text-secondary">
+                                    @note.Name
+                                </h5>
+                                <p class="card-text">@note.Content</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
     </div>
 </div>
 

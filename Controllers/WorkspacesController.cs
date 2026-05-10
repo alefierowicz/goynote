@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,11 +11,12 @@ using goynote.Models.System;
 
 namespace goynote.Controllers
 {
+    [Authorize]
     public class WorkspacesController : Controller
     {
-        private readonly DatabaseContext _context;
+        private readonly IdentityDatabaseContext _context;
 
-        public WorkspacesController(DatabaseContext context)
+        public WorkspacesController(IdentityDatabaseContext context)
         {
             _context = context;
         }

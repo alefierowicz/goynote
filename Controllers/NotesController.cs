@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -9,11 +10,12 @@ using goynote.Models.System;
 
 namespace goynote.Controllers
 {
+    [Authorize]
     public class NotesController : Controller
     {
-        private readonly DatabaseContext _context;
+        private readonly IdentityDatabaseContext _context;
 
-        public NotesController(DatabaseContext context)
+        public NotesController(IdentityDatabaseContext context)
         {
             _context = context;
         }

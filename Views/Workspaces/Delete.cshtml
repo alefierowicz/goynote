@@ -5,6 +5,8 @@
     ViewData["Title"] = "Delete";
 }
 
+@if (Model == null) { return; }
+
 
 <div class="container">
     <div class="row">
@@ -30,22 +32,43 @@
         </div>
     </div>
 
-    <div class="row">
-        <h3 class="text-lg text-danger">
-            Deleting the workspace will delete ALL of the following projects:
-        </h3>
-        @foreach (var item in Model?.Projects.Where(p => p.WorkspaceID == Model.ID)) {
-            <div class="col-md-4 mb-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">@item.Name</h5>
-                        <p class="card-text">@item.Description</p>
+    @{ var workspaceProjects = Model.Projects.Where(p => p.WorkspaceID == Model.ID); }
+    @if (workspaceProjects.Any()) {
+        <div class="row">
+            <h3 class="text-lg text-danger">
+                Deleting the workspace will delete ALL of the following projects:
+            </h3>
+            @foreach (var item in workspaceProjects) {
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">@item.Name</h5>
+                            <p class="card-text">@item.Description</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        }
-    </div>
+            }    
+        </div>
+    }
 
+    @{ var workspaceNotes = Model.Notes.Where(n => n.WorkspaceID == Model.ID); }
+    @if (workspaceNotes.Any()) {
+        <div class="row">
+            <h3 class="text-lg text-danger">
+                Deleting the workspace will delete ALL of the following notes:
+            </h3>
+            @foreach (var item in workspaceNotes) {
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">@item.Name</h5>
+                            <p class="card-text">@item.Content</p>
+                        </div>
+                    </div>
+                </div>
+            }    
+        </div>
+    }
     <div class="row text-center">
         <form asp-action="Delete">
             <input type="hidden" asp-for="ID" />

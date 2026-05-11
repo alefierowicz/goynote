@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using System.Runtime.InteropServices;
 using goynote.Models.System;
 using Microsoft.AspNetCore.Identity;
 
@@ -8,22 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 string? connectionString = builder.Configuration.GetConnectionString("GoynoteDB");
 
-var getDbContext = (DbContextOptionsBuilder o) =>
-{
-    bool isLocalDb = connectionString?.Contains("(localdb)", StringComparison.OrdinalIgnoreCase) ?? false;
-    bool canUseSqlServer = !string.IsNullOrEmpty(connectionString) && (!isLocalDb || RuntimeInformation.IsOSPlatform(OSPlatform.Windows));
-
-    if (canUseSqlServer)
-    {
-        o.UseSqlServer(connectionString);
-    }
-    else
-    {
-        o.UseSqlite("Data Source=goynote.db");
-    }
-};
-
-builder.Services.AddDbContext<IdentityDatabaseContext>(getDbContext);
+builder.Services.AddDbContext<IdentityDatabaseContext>(o =>
+    o.UseSqlite(connectionString ?? "Data Source=goynote.db")
+);
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<IdentityDatabaseContext>()

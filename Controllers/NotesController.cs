@@ -73,6 +73,36 @@ namespace goynote.Controllers
             return View(note);
         }
 
+        // GET: Notes/CreateProjectNote?projectId=(...)
+        public async Task<IActionResult> CreateProjectNote(Guid projectId)
+        {
+            var project = await _context.Projects.FindAsync(projectId);
+            if (project == null) return NotFound();
+
+            ProjectSpecificNote psn = new ProjectSpecificNote
+            {
+                ProjectID = projectId,
+                WorkspaceID = project.WorkspaceID
+            };
+
+            return View(psn);
+        }
+
+        // POST
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateProjectNote([Bind("Name, Content, ProjectID, WorkspaceID")]  ProjectSpecificNote psn)
+        {
+            if (ModelState.IsValid)
+            {
+                psn.ID = Guid.NewGuid();
+                _context.Add(psn);
+                await _context.SaveChangesAsync();
+                return RedirectToAction("Details", "Projects", new { id = psn.ProjectID });
+            }
+            return View(psn);
+        }
+
         // // GET: Project/Edit/5
         // public async Task<IActionResult> Edit(Guid? id)
         // {

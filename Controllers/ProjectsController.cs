@@ -36,7 +36,7 @@ namespace goynote.Controllers
             }
 
             var project = await _context.Projects
-                .Include(p => p.Workspace)
+                .Include(p => p.Workspace).Include(p => p.PSNotes)
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (project == null)
             {

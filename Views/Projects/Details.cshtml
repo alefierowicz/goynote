@@ -15,6 +15,9 @@
             <a asp-action="Edit" asp-route-id="@Model?.ID" class="btn btn-outline-light btn-sm">
                Edit
             </a>
+            <a asp-controller="Notes" asp-action="CreateProjectNote" asp-route-projectId= "@Model.ID" class=" btn btn-outline-light btn-sm">
+                New note
+            </a>
         </div>
     </div>
 </div>
@@ -24,7 +27,29 @@
 <div>
     <div class="container">
         <div class="row">
-            
+            @* rendering proj specific notes *@
+            @{
+                var notes = Model.PSNotes.ToList();
+            }
+            @if (notes.Any())
+            {
+                
+                <div class="row">
+                    @foreach (var note in notes)
+                    {
+                        <div class="col-md-6 mb-4">
+                            <div class="card border-secondary">
+                                <div class="card-body">
+                                    <h5 class="card-title text-secondary">
+                                        @note.Name
+                                    </h5>
+                                    <p class="card-text">@note.Content</p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
         </div>
     </div>
 </div>

@@ -33,7 +33,8 @@
                 </div>
                 
                 <input type="hidden" asp-for="ID" />
-                
+                <input type="hidden" asp-for="WorkspaceID" />
+
                 <div class="form-group">
                     <input type="submit" value="Save" class="btn btn-primary" />
                     <a asp-action="Details" asp-route-id="@Model?.ID" class="btn btn-outline-secondary">Back</a>

@@ -44,7 +44,7 @@
                 </div>
             }
         </div>
-        @{ var notes = Model.Notes.Where(n => n.WorkspaceID == Model.ID).ToList(); }
+        @{ var notes = Model.Notes.ToList(); }
 
         @if (notes.Any()) {
             <hr />

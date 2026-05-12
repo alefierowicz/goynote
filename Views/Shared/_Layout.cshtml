@@ -15,10 +15,13 @@
                     <div class="fs-5 fw-bold">Goynote</div>
                 </div>
 
-                @{ var currentController = ViewContext.RouteData.Values["controller"]?.ToString(); }
+                @{
+                    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+                    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+                }
 
                 <nav class="nav flex-column">
-                    <a class="nav-link @(currentController == "Workspaces" ? "active" : "")" asp-controller="Workspaces" asp-action="Index">
+                    <a class="nav-link @(currentController == "Workspaces" && currentAction == "Index" ? "active" : "")" asp-controller="Workspaces" asp-action="Index">
                         Workspaces
                     </a>
                     @await Component.InvokeAsync("WorkspaceSidebar")

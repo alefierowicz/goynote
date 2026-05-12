@@ -24,6 +24,7 @@
                     <a class="nav-link @(currentController == "Workspaces" ? "active" : "")" asp-controller="Workspaces" asp-action="Index">
                         Workspaces
                     </a>
+                    @await Component.InvokeAsync("WorkspaceSidebar")
                 </nav>
             </div>
 

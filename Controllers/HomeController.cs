@@ -8,7 +8,7 @@ namespace goynote.Controllers
     {
         public IActionResult Index()
         {
-            return View();
+            return RedirectToAction("Index", "Workspaces");
         }
 
         public IActionResult Privacy()

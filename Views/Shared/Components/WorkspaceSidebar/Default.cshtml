@@ -1,0 +1,10 @@
+@using goynote.Models.Objects
+@model IEnumerable<goynote.Models.Objects.Workspace>
+
+@foreach (var workspace in Model)
+{
+    var isActive = workspace.ID == (Guid)ViewBag.CurrentWorkspaceId;
+    <a class="nav-link ps-3 @(isActive ? "active" : "")" asp-controller="Workspaces" asp-action="Details" asp-route-id="@workspace.ID">
+        @workspace.Name
+    </a>
+}

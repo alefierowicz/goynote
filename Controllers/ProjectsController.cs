@@ -67,7 +67,7 @@ namespace goynote.Controllers
                 project.ID = Guid.NewGuid(); // Assign a new GUID for the project ID
                 _context.Add(project);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Details", "Workspaces", new { id = project.WorkspaceID });
             }
             ViewData["WorkspaceID"] = new SelectList(_context.Workspaces, "ID", "Name", project.WorkspaceID);
             return View(project);
@@ -118,7 +118,7 @@ namespace goynote.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Details", "Workspaces", new { id = project.WorkspaceID });
             }
             ViewData["WorkspaceID"] = new SelectList(_context.Workspaces, "ID", "Name", project.WorkspaceID);
             return View(project);

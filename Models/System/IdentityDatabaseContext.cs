@@ -15,7 +15,7 @@ namespace goynote.Models.System
         public DbSet<Project> Projects { get; set; }
         public DbSet<ProjectSpecificNote> PSNotes { get; set; }
         public DbSet<Workspace> Workspaces { get; set; }
-
+        public DbSet<Attachment> Attachments { get; set; }
         protected override void OnModelCreating(ModelBuilder mb)
         {
             base.OnModelCreating(mb);
@@ -36,6 +36,12 @@ namespace goynote.Models.System
                 .HasOne(psn => psn.Project)
                 .WithMany(p => p.PSNotes)
                 .HasForeignKey(psn => psn.ProjectID)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            mb.Entity<Attachment>()
+                .HasOne(n => n.Note)
+                .WithMany()
+                .HasForeignKey(n => n.NoteID)
                 .OnDelete(DeleteBehavior.NoAction);
         }
     }

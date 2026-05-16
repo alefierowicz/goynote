@@ -30,6 +30,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LogoutPath = "/Account/Logout";
     options.AccessDeniedPath = "/Account/AccessDenied";
 });
+builder.Services.AddScoped<S3Service>();
 
 var app = builder.Build();
 

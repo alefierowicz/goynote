@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using goynote.Models.Objects;
 using goynote.Models.System;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 
 namespace goynote.Controllers
 {
@@ -14,10 +15,11 @@ namespace goynote.Controllers
     public class NotesController : Controller
     {
         private readonly IdentityDatabaseContext _context;
-
-        public NotesController(IdentityDatabaseContext context)
+        private readonly S3Service _s3Service;
+        public NotesController(IdentityDatabaseContext context, S3Service S3Service)
         {
             _context = context;
+            _s3Service = S3Service;
         }
 
         // GET: Note
@@ -60,12 +62,31 @@ namespace goynote.Controllers
         // POST: Project/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Name,Content,WorkspaceID")] Note note)
+        public async Task<IActionResult> Create([Bind("ID,Name,Content,WorkspaceID")] Note note, IFormFile? file)
         {
             if (ModelState.IsValid)
             {
                 note.ID = Guid.NewGuid(); // Assign a new GUID for the note ID
                 _context.Add(note);
+                if(file != null)
+                {
+                    string? key = await _s3Service.UploadAsync(file);
+                    if (key == null) {
+                        ModelState.AddModelError("", "File upload failed - note was not saved.");
+                        return View(note);
+                    }
+
+                    _context.Attachments.Add(new Attachment
+                        {
+                            NoteID = note.ID,
+                            Note = note,
+                            S3Key = key,
+                            FileName = file.FileName,
+                            ContentType = file.ContentType,
+                            FileSize = (int)file.Length, // pending implementation of filesize limit on the frontend on upload.
+                        }
+                    );
+                }
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Details", "Workspaces", new { id = note.WorkspaceID });
             }
@@ -103,94 +124,5 @@ namespace goynote.Controllers
             return View(psn);
         }
 
-        // // GET: Project/Edit/5
-        // public async Task<IActionResult> Edit(Guid? id)
-        // {
-        //     if (id == null)
-        //     {
-        //         return NotFound();
-        //     }
-
-        //     var project = await _context.Projects.FindAsync(id);
-        //     if (project == null)
-        //     {
-        //         return NotFound();
-        //     }
-        //     ViewData["WorkspaceID"] = new SelectList(_context.Workspaces, "ID", "Name", project.WorkspaceID);
-        //     return View(project);
-        // }
-
-        // // POST: Project/Edit/5
-        // [HttpPost]
-        // [ValidateAntiForgeryToken]
-        // public async Task<IActionResult> Edit(Guid id, [Bind("ID,Name,Description,WorkspaceID")] Project project)
-        // {
-        //     if (id != project.ID)
-        //     {
-        //         return NotFound();
-        //     }
-
-        //     if (ModelState.IsValid)
-        //     {
-        //         try
-        //         {
-        //             _context.Update(project);
-        //             await _context.SaveChangesAsync();
-        //         }
-        //         catch (DbUpdateConcurrencyException)
-        //         {
-        //             if (!ProjectExists(project.ID))
-        //             {
-        //                 return NotFound();
-        //             }
-        //             else
-        //             {
-        //                 throw;
-        //             }
-        //         }
-        //         return RedirectToAction(nameof(Index));
-        //     }
-        //     ViewData["WorkspaceID"] = new SelectList(_context.Workspaces, "ID", "Name", project.WorkspaceID);
-        //     return View(project);
-        // }
-
-        // // GET: Project/Delete/5
-        // public async Task<IActionResult> Delete(Guid? id)
-        // {
-        //     if (id == null)
-        //     {
-        //         return NotFound();
-        //     }
-
-        //     var project = await _context.Projects
-        //         .Include(p => p.Workspace)
-        //         .FirstOrDefaultAsync(m => m.ID == id);
-        //     if (project == null)
-        //     {
-        //         return NotFound();
-        //     }
-
-        //     return View(project);
-        // }
-
-        // // POST: Project/Delete/5
-        // [HttpPost, ActionName("Delete")]
-        // [ValidateAntiForgeryToken]
-        // public async Task<IActionResult> DeleteConfirmed(Guid id)
-        // {
-        //     var project = await _context.Projects.FindAsync(id);
-        //     if (project != null)
-        //     {
-        //         _context.Projects.Remove(project);
-        //     }
-
-        //     await _context.SaveChangesAsync();
-        //     return RedirectToAction(nameof(Index));
-        // }
-
-        // private bool ProjectExists(Guid id)
-        // {
-        //     return _context.Projects.Any(e => e.ID == id);
-        // }
     }
 }

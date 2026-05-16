@@ -49,5 +49,29 @@ namespace goynote.Models.System
             }
         }
 
+        public async Task<Stream?> DownloadAsync(string key)
+        {
+            try
+            {
+                var request = new GetObjectRequest
+                {
+                    BucketName = bucketName,
+                    Key = key
+                };
+
+                var response = await _s3Client.GetObjectAsync(request);
+                return response.ResponseStream;
+            }
+            catch (AmazonS3Exception ex)
+            {
+                Console.WriteLine($"S3 Exception: {ex.Message}");
+                return null;
+            }
+            catch (Exception ex) {
+                Console.WriteLine($"Exception: {ex.Message}");
+                return null;
+            }
+        } 
+
     }
 }

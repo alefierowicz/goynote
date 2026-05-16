@@ -112,12 +112,34 @@ namespace goynote.Controllers
         // POST
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateProjectNote([Bind("Name, Content, ProjectID, WorkspaceID")]  ProjectSpecificNote psn)
+        public async Task<IActionResult> CreateProjectNote([Bind("Name,Content,ProjectID,WorkspaceID")] ProjectSpecificNote psn, IFormFile? file)
         {
             if (ModelState.IsValid)
             {
                 psn.ID = Guid.NewGuid();
                 _context.Add(psn);
+
+                if (file != null)
+                {
+                    var key = await _s3Service.UploadAsync(file);
+
+                    if (key == null)
+                    {
+                        ModelState.AddModelError("", "File upload failed. Note was not saved.");
+                        return View(psn);
+                    }
+
+                    _context.Add(new Attachment
+                    {
+                        ID = Guid.NewGuid(),
+                        NoteID = psn.ID,
+                        S3Key = key,
+                        FileName = file.FileName,
+                        ContentType = file.ContentType,
+                        FileSize = (int)file.Length
+                    });
+                }
+
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Details", "Projects", new { id = psn.ProjectID });
             }

@@ -10,7 +10,7 @@ namespace goynote.Models.System
         private readonly string bucketName;
         public S3Service(IConfiguration configuration)
         {
-            // BE AWARE
+            // BEWARE
             // this requires dotnet user-secrets to be set for the proper values.
             bucketName = configuration["AWS:BucketName"]!;
             _s3Client = new AmazonS3Client(
@@ -43,35 +43,60 @@ namespace goynote.Models.System
                 Console.WriteLine($"S3 Exception: {ex.Message}");
                 return null;
             }
-            catch (Exception ex) {
+            catch (Exception ex) 
+            {
                 Console.WriteLine($"Exception: {ex.Message}");
                 return null;
             }
         }
 
-        public async Task<Stream?> DownloadAsync(string key)
+        //public async Task<Stream?> DownloadAsync(string key)
+        //{
+        //    try
+        //    {
+        //        var request = new GetObjectRequest
+        //        {
+        //            BucketName = bucketName,
+        //            Key = key
+        //        };
+
+        //        var response = await _s3Client.GetObjectAsync(request);
+        //        return response.ResponseStream;
+        //    }
+        //    catch (AmazonS3Exception ex)
+        //    {
+        //        Console.WriteLine($"S3 Exception: {ex.Message}");
+        //        return null;
+        //    }
+        //    catch (Exception ex) {
+        //        Console.WriteLine($"Exception: {ex.Message}");
+        //        return null;
+        //    }
+        //}
+
+        public async Task<string?> GenerateURLAsync(string key)
         {
             try
             {
-                var request = new GetObjectRequest
+                var request = new GetPreSignedUrlRequest
                 {
                     BucketName = bucketName,
-                    Key = key
+                    Key = key,
+                    Expires = DateTime.UtcNow.AddMinutes(15)
                 };
-
-                var response = await _s3Client.GetObjectAsync(request);
-                return response.ResponseStream;
-            }
+                var response = await _s3Client.GetPreSignedURLAsync(request);
+                return response;
+            } 
             catch (AmazonS3Exception ex)
             {
                 Console.WriteLine($"S3 Exception: {ex.Message}");
                 return null;
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 Console.WriteLine($"Exception: {ex.Message}");
                 return null;
             }
-        } 
-
+        }
     }
 }

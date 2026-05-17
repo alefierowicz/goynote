@@ -1,13 +1,9 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using goynote.Models.Objects;
 using goynote.Models.System;
-using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 
 namespace goynote.Controllers
 {
@@ -144,6 +140,21 @@ namespace goynote.Controllers
                 return RedirectToAction("Details", "Projects", new { id = psn.ProjectID });
             }
             return View(psn);
+        }
+
+        // GET: Notes/Download/{id}
+        public async Task<IActionResult> Download(Guid id)
+        {
+            var attachment = await _context.Attachments.FindAsync(id);
+            if (attachment == null)
+                return NotFound();
+            
+            string? url = await _s3Service.GenerateURLAsync(attachment.S3Key);
+            if (url == null)
+            {
+                return Problem("Could not generate pre-signed URL");
+            }
+            return Redirect(url);
         }
 
     }

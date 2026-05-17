@@ -86,7 +86,7 @@ namespace goynote.Controllers
                             S3Key = key,
                             FileName = file.FileName,
                             ContentType = file.ContentType,
-                            FileSize = (int)file.Length, // pending implementation of filesize limit on the frontend on upload.
+                            FileSize = (int)file.Length, 
                         }
                     );
                 }
@@ -161,7 +161,7 @@ namespace goynote.Controllers
             if (attachment == null)
                 return NotFound();
             
-            string? url = await _s3Service.GenerateURLAsync(attachment.S3Key);
+            string? url = await _s3Service.GenerateURLAsync(attachment.S3Key, attachment.FileName);
             if (url == null)
             {
                 return Problem("Could not generate pre-signed URL");

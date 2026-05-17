@@ -74,7 +74,7 @@ namespace goynote.Models.System
         //    }
         //}
 
-        public async Task<string?> GenerateURLAsync(string key)
+        public async Task<string?> GenerateURLAsync(string key, string fileName)
         {
             try
             {
@@ -82,7 +82,11 @@ namespace goynote.Models.System
                 {
                     BucketName = bucketName,
                     Key = key,
-                    Expires = DateTime.UtcNow.AddMinutes(15)
+                    Expires = DateTime.UtcNow.AddMinutes(15),
+                    ResponseHeaderOverrides = new ResponseHeaderOverrides
+                    {
+                        ContentDisposition = $"attachment; filename=\"{fileName}\""
+                    }
                 };
                 var response = await _s3Client.GetPreSignedURLAsync(request);
                 return response;

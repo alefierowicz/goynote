@@ -10,6 +10,7 @@ namespace goynote.Controllers
     [Authorize]
     public class NotesController : Controller
     {
+        const long MAX_FILE_SIZE = 10 * 1024 * 1024;
         private readonly IdentityDatabaseContext _context;
         private readonly S3Service _s3Service;
         public NotesController(IdentityDatabaseContext context, S3Service S3Service)
@@ -66,6 +67,12 @@ namespace goynote.Controllers
                 _context.Add(note);
                 if(file != null)
                 {
+                    if(file.Length > MAX_FILE_SIZE)
+                    {
+                        ModelState.AddModelError("", "Uploaded file was too big.");
+                        return View(note);
+                    }
+
                     string? key = await _s3Service.UploadAsync(file);
                     if (key == null) {
                         ModelState.AddModelError("", "File upload failed - note was not saved.");
@@ -117,8 +124,13 @@ namespace goynote.Controllers
 
                 if (file != null)
                 {
-                    var key = await _s3Service.UploadAsync(file);
+                    if (file.Length > MAX_FILE_SIZE)
+                    {
+                        ModelState.AddModelError("", "Uploaded file was too big (Max accepted size: 10 MB)");
+                        return View(psn);
+                    }
 
+                    var key = await _s3Service.UploadAsync(file);
                     if (key == null)
                     {
                         ModelState.AddModelError("", "File upload failed. Note was not saved.");

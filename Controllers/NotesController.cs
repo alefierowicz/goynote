@@ -1,6 +1,3 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -13,11 +10,13 @@ namespace goynote.Controllers
     [Authorize]
     public class NotesController : Controller
     {
+        const long MAX_FILE_SIZE = 10 * 1024 * 1024;
         private readonly IdentityDatabaseContext _context;
-
-        public NotesController(IdentityDatabaseContext context)
+        private readonly S3Service _s3Service;
+        public NotesController(IdentityDatabaseContext context, S3Service S3Service)
         {
             _context = context;
+            _s3Service = S3Service;
         }
 
         // GET: Note
@@ -60,12 +59,37 @@ namespace goynote.Controllers
         // POST: Project/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Name,Content,WorkspaceID")] Note note)
+        public async Task<IActionResult> Create([Bind("ID,Name,Content,WorkspaceID")] Note note, IFormFile? file)
         {
             if (ModelState.IsValid)
             {
                 note.ID = Guid.NewGuid(); // Assign a new GUID for the note ID
                 _context.Add(note);
+                if(file != null)
+                {
+                    if(file.Length > MAX_FILE_SIZE)
+                    {
+                        ModelState.AddModelError("", "Uploaded file was too big.");
+                        return View(note);
+                    }
+
+                    string? key = await _s3Service.UploadAsync(file);
+                    if (key == null) {
+                        ModelState.AddModelError("", "File upload failed - note was not saved.");
+                        return View(note);
+                    }
+
+                    _context.Attachments.Add(new Attachment
+                        {
+                            NoteID = note.ID,
+                            Note = note,
+                            S3Key = key,
+                            FileName = file.FileName,
+                            ContentType = file.ContentType,
+                            FileSize = (int)file.Length, 
+                        }
+                    );
+                }
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Details", "Workspaces", new { id = note.WorkspaceID });
             }
@@ -91,106 +115,59 @@ namespace goynote.Controllers
         // POST
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateProjectNote([Bind("Name, Content, ProjectID, WorkspaceID")]  ProjectSpecificNote psn)
+        public async Task<IActionResult> CreateProjectNote([Bind("Name,Content,ProjectID,WorkspaceID")] ProjectSpecificNote psn, IFormFile? file)
         {
             if (ModelState.IsValid)
             {
                 psn.ID = Guid.NewGuid();
                 _context.Add(psn);
+
+                if (file != null)
+                {
+                    if (file.Length > MAX_FILE_SIZE)
+                    {
+                        ModelState.AddModelError("", "Uploaded file was too big (Max accepted size: 10 MB)");
+                        return View(psn);
+                    }
+
+                    var key = await _s3Service.UploadAsync(file);
+                    if (key == null)
+                    {
+                        ModelState.AddModelError("", "File upload failed. Note was not saved.");
+                        return View(psn);
+                    }
+
+                    _context.Add(new Attachment
+                    {
+                        ID = Guid.NewGuid(),
+                        NoteID = psn.ID,
+                        S3Key = key,
+                        FileName = file.FileName,
+                        ContentType = file.ContentType,
+                        FileSize = (int)file.Length
+                    });
+                }
+
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Details", "Projects", new { id = psn.ProjectID });
             }
             return View(psn);
         }
 
-        // // GET: Project/Edit/5
-        // public async Task<IActionResult> Edit(Guid? id)
-        // {
-        //     if (id == null)
-        //     {
-        //         return NotFound();
-        //     }
+        // GET: Notes/Download/{id}
+        public async Task<IActionResult> Download(Guid id)
+        {
+            var attachment = await _context.Attachments.FindAsync(id);
+            if (attachment == null)
+                return NotFound();
+            
+            string? url = await _s3Service.GenerateURLAsync(attachment.S3Key, attachment.FileName);
+            if (url == null)
+            {
+                return Problem("Could not generate pre-signed URL");
+            }
+            return Redirect(url);
+        }
 
-        //     var project = await _context.Projects.FindAsync(id);
-        //     if (project == null)
-        //     {
-        //         return NotFound();
-        //     }
-        //     ViewData["WorkspaceID"] = new SelectList(_context.Workspaces, "ID", "Name", project.WorkspaceID);
-        //     return View(project);
-        // }
-
-        // // POST: Project/Edit/5
-        // [HttpPost]
-        // [ValidateAntiForgeryToken]
-        // public async Task<IActionResult> Edit(Guid id, [Bind("ID,Name,Description,WorkspaceID")] Project project)
-        // {
-        //     if (id != project.ID)
-        //     {
-        //         return NotFound();
-        //     }
-
-        //     if (ModelState.IsValid)
-        //     {
-        //         try
-        //         {
-        //             _context.Update(project);
-        //             await _context.SaveChangesAsync();
-        //         }
-        //         catch (DbUpdateConcurrencyException)
-        //         {
-        //             if (!ProjectExists(project.ID))
-        //             {
-        //                 return NotFound();
-        //             }
-        //             else
-        //             {
-        //                 throw;
-        //             }
-        //         }
-        //         return RedirectToAction(nameof(Index));
-        //     }
-        //     ViewData["WorkspaceID"] = new SelectList(_context.Workspaces, "ID", "Name", project.WorkspaceID);
-        //     return View(project);
-        // }
-
-        // // GET: Project/Delete/5
-        // public async Task<IActionResult> Delete(Guid? id)
-        // {
-        //     if (id == null)
-        //     {
-        //         return NotFound();
-        //     }
-
-        //     var project = await _context.Projects
-        //         .Include(p => p.Workspace)
-        //         .FirstOrDefaultAsync(m => m.ID == id);
-        //     if (project == null)
-        //     {
-        //         return NotFound();
-        //     }
-
-        //     return View(project);
-        // }
-
-        // // POST: Project/Delete/5
-        // [HttpPost, ActionName("Delete")]
-        // [ValidateAntiForgeryToken]
-        // public async Task<IActionResult> DeleteConfirmed(Guid id)
-        // {
-        //     var project = await _context.Projects.FindAsync(id);
-        //     if (project != null)
-        //     {
-        //         _context.Projects.Remove(project);
-        //     }
-
-        //     await _context.SaveChangesAsync();
-        //     return RedirectToAction(nameof(Index));
-        // }
-
-        // private bool ProjectExists(Guid id)
-        // {
-        //     return _context.Projects.Any(e => e.ID == id);
-        // }
     }
 }

@@ -19,6 +19,7 @@ namespace goynote.Models.Objects
         [ValidateNever]
         public Workspace Workspace { get; set; } = null!;
 
+        public ICollection<Attachment>? Attachments { get; set; } = new List<Attachment>();
         public Note() : base() { }
     }
 }

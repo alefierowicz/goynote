@@ -7,7 +7,7 @@ using goynote.Models.System;
 
 #nullable disable
 
-namespace goynote.Migrations.IdentityDatabase
+namespace goynote.Migrations
 {
     [DbContext(typeof(IdentityDatabaseContext))]
     partial class IdentityDatabaseContextModelSnapshot : ModelSnapshot
@@ -143,6 +143,40 @@ namespace goynote.Migrations.IdentityDatabase
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("goynote.Models.Objects.Attachment", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("FileSize")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("NoteID")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("S3Key")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("NoteID");
+
+                    b.ToTable("Attachments");
                 });
 
             modelBuilder.Entity("goynote.Models.Objects.Note", b =>
@@ -351,6 +385,17 @@ namespace goynote.Migrations.IdentityDatabase
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("goynote.Models.Objects.Attachment", b =>
+                {
+                    b.HasOne("goynote.Models.Objects.Note", "Note")
+                        .WithMany()
+                        .HasForeignKey("NoteID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Note");
                 });
 
             modelBuilder.Entity("goynote.Models.Objects.Note", b =>

@@ -38,6 +38,7 @@ namespace goynote.Controllers
             var workspace = await _context.Workspaces
                 .Include(w => w.Projects)
                 .Include(w => w.Notes.Where(n => !(n is ProjectSpecificNote)))
+                    .ThenInclude(n => n.Attachments)
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (workspace == null)
             {

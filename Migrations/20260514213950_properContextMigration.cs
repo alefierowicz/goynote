@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace goynote.Migrations.IdentityDatabase
+namespace goynote.Migrations
 {
     /// <inheritdoc />
-    public partial class AddIdentity : Migration
+    public partial class properContextMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -216,6 +216,26 @@ namespace goynote.Migrations.IdentityDatabase
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Attachments",
+                columns: table => new
+                {
+                    ID = table.Column<Guid>(type: "TEXT", nullable: false),
+                    NoteID = table.Column<Guid>(type: "TEXT", nullable: false),
+                    S3Key = table.Column<string>(type: "TEXT", nullable: false),
+                    FileName = table.Column<string>(type: "TEXT", nullable: false),
+                    ContentType = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Attachments", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_Attachments_Notes_NoteID",
+                        column: x => x.NoteID,
+                        principalTable: "Notes",
+                        principalColumn: "ID");
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -254,6 +274,11 @@ namespace goynote.Migrations.IdentityDatabase
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Attachments_NoteID",
+                table: "Attachments",
+                column: "NoteID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Notes_ProjectID",
                 table: "Notes",
                 column: "ProjectID");
@@ -288,13 +313,16 @@ namespace goynote.Migrations.IdentityDatabase
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Notes");
+                name: "Attachments");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Notes");
 
             migrationBuilder.DropTable(
                 name: "Projects");

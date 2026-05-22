@@ -5,24 +5,6 @@
     ViewData["Title"] = "Details";
 }
 
-@functions {
-    string FormatSize(int bytes) {
-        if (bytes < 1024) return $"{bytes} B";
-        if (bytes < 1048576) return $"{bytes / 1024} KB";
-        return $"{bytes / 1048576.0:0.#} MB";
-    }
-
-    string TruncateWords(string input, int wordLimit) {
-        if (string.IsNullOrWhiteSpace(input)) return input;
-
-        var words = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-        if (words.Length <= wordLimit) return input;
-
-        return string.Join(" ", words.Take(wordLimit)) + "...";
-    }
-}
-
 <div class="container">
     <div class="row align-items-center">
         <div class="col-md-6 text-start">
@@ -53,37 +35,8 @@
             {
                 
                 <div class="row">
-                    @foreach (var note in notes)
-                    {
-                        <div class="col-md-6 mb-4">
-                            <div class="card border-secondary">
-                                <a asp-controller="Notes" asp-action="Details" asp-route-id="@note.ID" class="stretched-link"></a>
-                                <div class="card-body">
-                                    <h5 class="card-title text-white pb-2 border-bottom">
-                                        @note.Name
-                                    </h5>
-                                    <div class="card-text markdownContent text-muted small" style="opacity: 0.8; line-height: 1.4;">@TruncateWords(note.Content, 20)</div>
-                                    <div class="mt-2 pt-2 border-top">
-                                        @if (note.Attachments != null && note.Attachments.Any())
-                                        {
-                                            @foreach (var att in note.Attachments)
-                                            {
-                                                <div class="small text-muted d-flex justify-content-between">
-                                                    <a asp-controller="Notes" asp-action="Download" asp-route-id="@att.ID" class="text-truncate me-2 link-secondary text-decoration-none">
-                                                        <i class="bi bi-paperclip me-1" style="font-size: 0.9rem;"></i>@att.FileName
-                                                    </a>
-                                                    <span class="flex-shrink-0">@FormatSize(att.FileSize) · @att.CreatedAt.ToString("yyyy-MM-dd")</span>
-                                                </div>
-                                            }
-                                        }
-                                        else
-                                        {
-                                            <div class="small text-muted fst-italic">No files attached.</div>
-                                        }
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    @foreach (var note in notes){
+                        <partial name="_NoteCard" model="note" />
                     }
                 </div>
             }

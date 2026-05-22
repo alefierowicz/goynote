@@ -51,7 +51,7 @@
                                     <h5 class="card-title text-secondary">
                                         @note.Name
                                     </h5>
-                                    <p class="card-text">@note.Content</p>
+                                    <p class="card-text markdownContent">@note.Content</p>
                                     <div class="mt-2 pt-2 border-top">
                                         @if (note.Attachments != null && note.Attachments.Any())
                                         {
@@ -79,3 +79,8 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/markdownPreview.js"></script>
+}

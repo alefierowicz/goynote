@@ -1,0 +1,8 @@
+{
+    "AWS": {
+        "BucketName": "",
+        "Region": "",
+        "AccessKey": "",
+        "SecretKey": ""
+    }
+}

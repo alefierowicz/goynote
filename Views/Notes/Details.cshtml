@@ -1,0 +1,21 @@
+@using goynote.Models.Objects
+@model goynote.Models.Objects.Note
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<div class="container">
+    <div class="row align-items-center">
+        <div class="col-md-6 text-start">
+            <h1>@Html.DisplayFor(model => model.Name)</h1>
+        </div>
+        <div class="mt-2 mb-4 border-bottom"></div>
+        <div class="markdownContent">@Html.DisplayFor(model => model.Content)</div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/markdownPreview.js"></script>
+}

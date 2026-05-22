@@ -57,6 +57,7 @@
                     {
                         <div class="col-md-6 mb-4">
                             <div class="card border-secondary">
+                                <a asp-controller="Notes" asp-action="Details" asp-route-id="@note.ID" class="stretched-link"></a>
                                 <div class="card-body">
                                     <h5 class="card-title text-white pb-2 border-bottom">
                                         @note.Name

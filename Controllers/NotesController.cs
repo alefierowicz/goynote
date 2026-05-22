@@ -37,6 +37,7 @@ namespace goynote.Controllers
             var note = await _context.Notes
                 .Include(p => p.Workspace)
                 .FirstOrDefaultAsync(m => m.ID == id);
+                
             if (note == null)
             {
                 return NotFound();

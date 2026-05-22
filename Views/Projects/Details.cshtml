@@ -11,6 +11,16 @@
         if (bytes < 1048576) return $"{bytes / 1024} KB";
         return $"{bytes / 1048576.0:0.#} MB";
     }
+
+    string TruncateWords(string input, int wordLimit) {
+        if (string.IsNullOrWhiteSpace(input)) return input;
+
+        var words = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+        if (words.Length <= wordLimit) return input;
+
+        return string.Join(" ", words.Take(wordLimit)) + "...";
+    }
 }
 
 <div class="container">
@@ -51,7 +61,7 @@
                                     <h5 class="card-title text-secondary">
                                         @note.Name
                                     </h5>
-                                    <p class="card-text markdownContent">@note.Content</p>
+                                    <div class="card-text markdownContent">@TruncateWords(note.Content, 20)</div>
                                     <div class="mt-2 pt-2 border-top">
                                         @if (note.Attachments != null && note.Attachments.Any())
                                         {

@@ -71,10 +71,10 @@
                     <div class="col-md-6 mb-4">
                         <div class="card border-secondary">
                             <div class="card-body">
-                                <h5 class="card-title text-secondary">
+                                <h5 class="card-title text-white pb-2 border-bottom">
                                     @note.Name
                                 </h5>
-                                <div class="card-text markdownContent">@TruncateWords(note.Content, 20)</div>
+                                <div class="card-text markdownContent text-muted small" style="opacity: 0.8; line-height: 1.4;">@TruncateWords(note.Content, 20)</div>
                                 <div class="mt-2 pt-2 border-top">
                                     @if (note.Attachments != null && note.Attachments.Any()) {
                                         @foreach (var att in note.Attachments) {

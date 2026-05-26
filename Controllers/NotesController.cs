@@ -13,10 +13,13 @@ namespace goynote.Controllers
         const long MAX_FILE_SIZE = 10 * 1024 * 1024;
         private readonly IdentityDatabaseContext _context;
         private readonly S3Service _s3Service;
-        public NotesController(IdentityDatabaseContext context, S3Service S3Service)
+        private readonly PDFService _pdfService;
+        
+        public NotesController(IdentityDatabaseContext context, S3Service S3Service, PDFService pdfService)
         {
             _context = context;
             _s3Service = S3Service;
+            _pdfService = pdfService;
         }
 
         // GET: Note
@@ -171,5 +174,20 @@ namespace goynote.Controllers
             return Redirect(url);
         }
 
+        public async Task<IActionResult> DownloadPDF(Guid id)
+        {
+            var note = await _context.Notes
+                .Include(p => p.Workspace)
+                .Include(p => p.Attachments)
+                .FirstOrDefaultAsync(m => m.ID == id);
+
+            if (note == null)
+                return NotFound();
+
+            byte[] pdfBytes = _pdfService.GenerateNotePDF(note);
+            string fileName = $"{note.Name.Replace(" ", "_")}.pdf";
+
+            return File(pdfBytes, "application/pdf", fileName);
+        }
     }
 }

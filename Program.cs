@@ -31,6 +31,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Account/AccessDenied";
 });
 builder.Services.AddScoped<S3Service>();
+builder.Services.AddScoped<PDFService>();
 
 var app = builder.Build();
 

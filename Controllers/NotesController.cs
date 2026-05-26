@@ -36,6 +36,7 @@ namespace goynote.Controllers
 
             var note = await _context.Notes
                 .Include(p => p.Workspace)
+                .Include(p => p.Attachments)
                 .FirstOrDefaultAsync(m => m.ID == id);
                 
             if (note == null)

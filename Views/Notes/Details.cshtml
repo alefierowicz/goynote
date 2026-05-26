@@ -8,10 +8,29 @@
 <div class="container">
     <div class="row align-items-center">
         <div class="col-md-6 text-start">
-            <h1>@Html.DisplayFor(model => model.Name)</h1>
+            <h1>@Html.DisplayFor(Model => Model.Name)</h1>
         </div>
         <div class="mt-2 mb-4 border-bottom"></div>
-        <div class="markdownContent">@Html.DisplayFor(model => model.Content)</div>
+        <div class="markdownContent">@Html.DisplayFor(Model => Model.Content)</div>
+    </div>
+
+    <div class="mt-2 pt-2 border-top">
+        @if (Model.Attachments != null && Model.Attachments.Any())
+        {
+            @foreach (var att in Model.Attachments)
+            {
+                <div class="small text-muted d-flex justify-content-between">
+                    <a asp-controller="Notes" asp-action="Download" asp-route-id="@att.ID" class="text-truncate me-2 link-secondary text-decoration-none">
+                        <i class="bi bi-paperclip me-1" style="font-size: 0.9rem;"></i>@att.FileName
+                    </a>
+                    <span class="flex-shrink-0">@ViewHelpers.FormatSize(att.FileSize) · @att.CreatedAt.ToString("yyyy-MM-dd")</span>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="small text-muted fst-italic">No files attached.</div>
+        }
     </div>
 </div>
 

@@ -13,11 +13,8 @@
                 {
                     @foreach (var att in Model.Attachments)
                     {
-                        <div class="small text-muted d-flex justify-content-between">
-                            <a asp-controller="Notes" asp-action="Download" asp-route-id="@att.ID" class="text-truncate me-2 link-secondary text-decoration-none">
-                                <i class="bi bi-paperclip me-1" style="font-size: 0.9rem;"></i>@att.FileName
-                            </a>
-                            <span class="flex-shrink-0">@ViewHelpers.FormatSize(att.FileSize) · @att.CreatedAt.ToString("yyyy-MM-dd")</span>
+                        <div class="small text-muted">
+                            <i class="bi bi-paperclip me-1" style="font-size: 0.9rem;"></i>@att.FileName
                         </div>
                     }
                 }

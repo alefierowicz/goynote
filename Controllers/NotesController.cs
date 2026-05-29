@@ -14,12 +14,14 @@ namespace goynote.Controllers
         private readonly IdentityDatabaseContext _context;
         private readonly S3Service _s3Service;
         private readonly PDFService _pdfService;
+        private readonly MarkdownService _markdownService;
         
-        public NotesController(IdentityDatabaseContext context, S3Service S3Service, PDFService pdfService)
+        public NotesController(IdentityDatabaseContext context, S3Service S3Service, PDFService pdfService, MarkdownService markdownService)
         {
             _context = context;
             _s3Service = S3Service;
             _pdfService = pdfService;
+            _markdownService = markdownService;
         }
 
         // GET: Note
@@ -188,6 +190,22 @@ namespace goynote.Controllers
             string fileName = $"{note.Name.Replace(" ", "_")}.pdf";
 
             return File(pdfBytes, "application/pdf", fileName);
+        }
+
+        public async Task<IActionResult> DownloadMarkdown(Guid id)
+        {
+            var note = await _context.Notes
+                .Include(p => p.Workspace)
+                .Include(p => p.Attachments)
+                .FirstOrDefaultAsync(m => m.ID == id);
+
+            if (note == null)
+                return NotFound();
+
+            byte[] markdownBytes = _markdownService.GenerateNoteMarkdown(note);
+            string fileName = $"{note.Name.Replace(" ", "_")}.md";
+
+            return File(markdownBytes, "text/markdown", fileName);
         }
     }
 }

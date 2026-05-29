@@ -32,6 +32,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 builder.Services.AddScoped<S3Service>();
 builder.Services.AddScoped<PDFService>();
+builder.Services.AddScoped<MarkdownService>();
 
 var app = builder.Build();
 

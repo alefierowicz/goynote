@@ -42,7 +42,7 @@ namespace goynote.Models.System
                 .HasOne(n => n.Note)
                 .WithMany(n => n.Attachments)
                 .HasForeignKey(n => n.NoteID)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

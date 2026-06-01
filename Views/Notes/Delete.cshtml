@@ -1,0 +1,42 @@
+@using goynote.Models.Objects
+@model goynote.Models.Objects.Note
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<div class="container">
+    <h1>Delete note</h1>
+    <h5 class="text-muted">Are you sure you want to delete this note?</h5>
+
+    <hr />
+
+    <div class="mb-3">
+        <div class="fw-bold">@Html.DisplayNameFor(m => m.Name)</div>
+        <div>@Model.Name</div>
+    </div>
+
+    <div class="mb-3">
+        <div class="fw-bold">@Html.DisplayNameFor(m => m.Content)</div>
+        <div class="markdownContent">@Model.Content</div>
+    </div>
+
+    @if (Model.Attachments != null && Model.Attachments.Any())
+    {
+        <div class="alert alert-warning small">
+            <i class="bi bi-info-circle me-2"></i>
+            This note has <strong>@Model.Attachments.Count</strong> attachment(s).
+            They will <strong>not</strong> be deleted &mdash; files remain in storage.
+        </div>
+    }
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="ID" />
+        <button type="submit" class="btn btn-danger">
+            <i class="bi bi-trash me-1"></i>Delete
+        </button>
+        <a asp-controller="Notes" asp-action="Details" asp-route-id="@Model.ID" class="btn btn-outline-secondary">
+            Cancel
+        </a>
+    </form>
+</div>

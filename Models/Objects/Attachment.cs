@@ -5,11 +5,10 @@ namespace goynote.Models.Objects
 {
     public class Attachment : DatabaseEntry
     {
-        [Required]
-        public Guid NoteID {  get; set; }
+        public Guid? NoteID { get; set; }
 
-        [ValidateNever] 
-        public Note Note { get; set; }
+        [ValidateNever]
+        public Note? Note { get; set; }
 
         [Required]
         public string S3Key { get; set; } = string.Empty;

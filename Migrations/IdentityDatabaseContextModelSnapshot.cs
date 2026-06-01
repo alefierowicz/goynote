@@ -165,7 +165,7 @@ namespace goynote.Migrations
                     b.Property<int>("FileSize")
                         .HasColumnType("INTEGER");
 
-                    b.Property<Guid>("NoteID")
+                    b.Property<Guid?>("NoteID")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("S3Key")
@@ -390,10 +390,9 @@ namespace goynote.Migrations
             modelBuilder.Entity("goynote.Models.Objects.Attachment", b =>
                 {
                     b.HasOne("goynote.Models.Objects.Note", "Note")
-                        .WithMany()
+                        .WithMany("Attachments")
                         .HasForeignKey("NoteID")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Note");
                 });
@@ -429,6 +428,11 @@ namespace goynote.Migrations
                         .IsRequired();
 
                     b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("goynote.Models.Objects.Note", b =>
+                {
+                    b.Navigation("Attachments");
                 });
 
             modelBuilder.Entity("goynote.Models.Objects.Project", b =>

@@ -207,5 +207,73 @@ namespace goynote.Controllers
 
             return File(markdownBytes, "text/markdown", fileName);
         }
+
+        // GET: Notes/Edit/{id}
+        public async Task<IActionResult> Edit(Guid? id)
+        {
+            if (id == null) return NotFound();
+
+            var note = await _context.Notes.FirstOrDefaultAsync(n => n.ID == id);
+            if (note == null) return NotFound();
+
+            return View(note);
+        }
+
+        // POST: Notes/Edit/{id}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(Guid id, [Bind("ID,Name,Content,WorkspaceID")] Note note)
+        {
+            if (id != note.ID) return NotFound();
+
+            if (!ModelState.IsValid) return View(note);
+
+            var existing = await _context.Notes.FirstOrDefaultAsync(n => n.ID == id);
+            if (existing == null) return NotFound();
+
+            existing.Name = note.Name;
+            existing.Content = note.Content;
+
+            await _context.SaveChangesAsync();
+
+            if (existing is ProjectSpecificNote psn)
+                return RedirectToAction("Details", "Projects", new { id = psn.ProjectID });
+
+            return RedirectToAction("Details", "Workspaces", new { id = existing.WorkspaceID });
+        }
+
+        // GET: Notes/Delete/{id}
+        public async Task<IActionResult> Delete(Guid? id)
+        {
+            if (id == null) return NotFound();
+
+            var note = await _context.Notes
+                .Include(n => n.Attachments)
+                .FirstOrDefaultAsync(n => n.ID == id);
+
+            if (note == null) return NotFound();
+
+            return View(note);
+        }
+
+        // POST: Notes/Delete/{id}
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(Guid id)
+        {
+            var note = await _context.Notes.FirstOrDefaultAsync(n => n.ID == id);
+            if (note == null) return NotFound();
+
+            Guid workspaceId = note.WorkspaceID;
+            Guid? projectId = (note as ProjectSpecificNote)?.ProjectID;
+
+            _context.Notes.Remove(note);
+            await _context.SaveChangesAsync();
+
+            if (projectId.HasValue)
+                return RedirectToAction("Details", "Projects", new { id = projectId.Value });
+
+            return RedirectToAction("Details", "Workspaces", new { id = workspaceId });
+        }
     }
 }

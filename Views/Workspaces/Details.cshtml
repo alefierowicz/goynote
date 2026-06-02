@@ -38,9 +38,15 @@
             <a asp-controller="Projects" asp-action="Create" asp-route-workspaceId="@Model.ID" class="btn btn-outline-light btn-sm">
                 New project
             </a>
-            <a asp-action="Edit" asp-route-id="@Model.ID" class="btn btn-outline-light btn-sm">
-               Edit
-            </a>
+            @if (ViewData["IsOwner"] as bool? == true)
+            {
+                <a asp-action="Edit" asp-route-id="@Model.ID" class="btn btn-outline-light btn-sm">
+                   Edit
+                </a>
+                <a asp-action="Members" asp-route-id="@Model.ID" class="btn btn-outline-light btn-sm">
+                    Members
+                </a>
+            }
         </div>
     </div>
 </div>

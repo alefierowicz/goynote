@@ -1,0 +1,109 @@
+@using goynote.Models.Objects
+@model goynote.Models.Objects.Workspace
+
+@{
+    ViewData["Title"] = "Manage Members";
+}
+
+<div class="container">
+    <div class="row align-items-center">
+        <div class="col-md-6 text-start">
+            <h1>Manage Members</h1>
+            <p class="text-muted">@Model.Name</p>
+        </div>
+        <div class="col-md-6 text-end">
+            <a asp-action="Details" asp-route-id="@Model.ID" class="btn btn-outline-secondary btn-sm">
+                Back to workspace
+            </a>
+        </div>
+    </div>
+</div>
+
+<hr />
+
+<div class="container">
+    <div class="row">
+        <div class="col-12 col-md-6">
+            <h3>Add New Member</h3>
+            <form id="addMemberForm" method="post" asp-action="AddMember">
+                <div class="form-group mb-3">
+                    <label for="userEmail" class="form-label fw-bold">Email Address</label>
+                    <input type="email" id="userEmail" name="userEmail" class="form-control" placeholder="user@example.com" required />
+                    <small class="form-text text-muted">Enter the email of the user you want to add</small>
+                </div>
+                
+                <input type="hidden" name="workspaceId" value="@Model.ID" />
+                
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Add Member</button>
+                </div>
+            </form>
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                    @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<hr />
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h3>Current Members</h3>
+            @if (Model.Members.Any())
+            {
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Email</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var member in Model.Members)
+                        {
+                            <tr>
+                                <td>
+                                    @member.User.UserName
+                                </td>
+                                <td>
+                                    @member.User.Email
+                                </td>
+                                <td>
+                                    <form method="post" asp-action="RemoveMember" style="display:inline;">
+                                        <input type="hidden" name="workspaceId" value="@Model.ID" />
+                                        <input type="hidden" name="memberId" value="@member.ID" />
+                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?');">Remove</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p class="text-muted">No members yet. Add your first member above.</p>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

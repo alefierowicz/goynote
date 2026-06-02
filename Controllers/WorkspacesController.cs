@@ -61,13 +61,21 @@ namespace goynote.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Name,Description,ID")] Workspace workspace)
         {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
             if (ModelState.IsValid)
             {
                 workspace.ID = Guid.NewGuid();
+                workspace.OwnerId = userId;
                 _context.Add(workspace);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
-            }
+            }         
+              
             return View(workspace);
         }
 
@@ -92,7 +100,7 @@ namespace goynote.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Name,Description,ID")] Workspace workspace)
+        public async Task<IActionResult> Edit(Guid id, [Bind("Name,Description,ID,IsPublic")] Workspace workspace)
         {
             if (id != workspace.ID)
             {
@@ -103,7 +111,15 @@ namespace goynote.Controllers
             {
                 try
                 {
-                    _context.Update(workspace);
+                    var existingWorkspace = await _context.Workspaces.FindAsync(id);
+                    if (existingWorkspace == null)
+                    {
+                        return NotFound();
+                    }
+                    existingWorkspace.Name = workspace.Name;
+                    existingWorkspace.Description = workspace.Description;
+                    existingWorkspace.IsPublic = workspace.IsPublic;
+                    _context.Update(existingWorkspace);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)

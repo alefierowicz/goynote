@@ -50,6 +50,7 @@ namespace goynote.Controllers
                 .Include(w => w.Notes.Where(n => !(n is ProjectSpecificNote)))
                     .ThenInclude(n => n.Attachments)
                 .Include(w => w.Members)
+                .Include(w => w.Owner)
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (workspace == null)
             {

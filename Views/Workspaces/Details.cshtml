@@ -30,6 +30,14 @@
         <div class="col-md-6 text-start">
             <h1>@Html.DisplayFor(model => model.Name)</h1>
             <p>@Html.DisplayFor(model => model.Description)</p>
+            @if (ViewData["IsOwner"] as bool? == true)
+            {
+                <p class="fw-bold">You are this workspace's owner</p>
+            }
+            else 
+            {
+                <p class="fw-bold">You are a member of this workspace. It is owned by @Html.DisplayFor(model => model.Owner.Email)</p>
+            }
         </div>
         <div class="col-md-6 text-end">
             <a asp-controller="Notes" asp-action="Create" asp-route-workspaceId="@Model.ID" class="btn btn-outline-light btn-sm">

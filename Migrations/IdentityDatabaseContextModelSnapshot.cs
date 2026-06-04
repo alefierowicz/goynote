@@ -250,14 +250,45 @@ namespace goynote.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("OwnerId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.HasKey("ID");
 
+                    b.HasIndex("OwnerId");
+
                     b.ToTable("Workspaces");
+                });
+
+            modelBuilder.Entity("goynote.Models.Objects.WorkspaceMember", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("WorkspaceID")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("WorkspaceID");
+
+                    b.ToTable("WorkspaceMembers");
                 });
 
             modelBuilder.Entity("goynote.Models.System.ApplicationUser", b =>
@@ -419,6 +450,36 @@ namespace goynote.Migrations
                     b.Navigation("Workspace");
                 });
 
+            modelBuilder.Entity("goynote.Models.Objects.Workspace", b =>
+                {
+                    b.HasOne("goynote.Models.System.ApplicationUser", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Owner");
+                });
+
+            modelBuilder.Entity("goynote.Models.Objects.WorkspaceMember", b =>
+                {
+                    b.HasOne("goynote.Models.System.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("goynote.Models.Objects.Workspace", "Workspace")
+                        .WithMany("Members")
+                        .HasForeignKey("WorkspaceID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+
+                    b.Navigation("Workspace");
+                });
+
             modelBuilder.Entity("goynote.Models.Objects.ProjectSpecificNote", b =>
                 {
                     b.HasOne("goynote.Models.Objects.Project", "Project")
@@ -442,6 +503,8 @@ namespace goynote.Migrations
 
             modelBuilder.Entity("goynote.Models.Objects.Workspace", b =>
                 {
+                    b.Navigation("Members");
+
                     b.Navigation("Notes");
 
                     b.Navigation("Projects");

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using goynote.Models.System;
+using System.Security.Claims;
 
 namespace goynote.ViewComponents
 {
@@ -16,10 +17,14 @@ namespace goynote.ViewComponents
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            if (!HttpContext.User.Identity?.IsAuthenticated ?? true)
+            var userID = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userID == null)
                 return Content(string.Empty);
 
-            var workspaces = await _context.Workspaces.ToListAsync();
+            var workspaces = await _context.Workspaces
+                                    .Where(w => w.OwnerId == userID || w.Members.Any(m => m.UserId == userID))
+                                    .ToListAsync();
 
             Guid.TryParse(HttpContext.GetRouteValue("id")?.ToString(), out var currentId);
             ViewBag.CurrentWorkspaceId = currentId;

@@ -14,10 +14,19 @@ namespace goynote.Models.API
         IEnumerable<AttachmentDTO> Attachments
     );
 
+    public record ProjectDTO(
+        Guid Id,
+        string Name,
+        string Description,
+        IEnumerable<NoteDTO> Notes
+    );
+
     public record WorkspaceDTO(
         Guid Id,
         string Name,
         string? Description,
-        string OwnerEmail, IEnumerable<NoteDTO> Notes
+        string OwnerEmail,
+        IEnumerable<NoteDTO> Notes,
+        IEnumerable<ProjectDTO> Projects
     );
 }

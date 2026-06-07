@@ -8,7 +8,7 @@ namespace goynote.Controllers.API
 {
     [ApiController]
     [Route("api/workspaces")]
-    public class PublicWorkspacesController : Controller
+    public class PublicWorkspacesController : ControllerBase
     {
         private readonly IdentityDatabaseContext _context;
         public PublicWorkspacesController(IdentityDatabaseContext c) => _context = c;
@@ -21,39 +21,55 @@ namespace goynote.Controllers.API
                 .Where(w => w.IsPublic)
                 .Include(w => w.Owner)
                 .Include(w => w.Notes).ThenInclude(n => n.Attachments)
+                .Include(w => w.Projects).ThenInclude(p => p.PSNotes).ThenInclude(n => n.Attachments)
+                .AsSplitQuery()
                 .ToListAsync();
 
-            var DTOs = workspaces.Select(MapToDTO).ToList();
+            var DTOs = workspaces.Select(MapWorkspace).ToList();
             return Ok(DTOs);
         }
 
         // GET /api/workspaces/{id}
         [HttpGet("{id:guid}")]
-        public async Task<ActionResult<IEnumerable<WorkspaceDTO>>> GetPublicByID(Guid id)
+        public async Task<ActionResult<WorkspaceDTO>> GetPublicByID(Guid id)
         {
             var workspace = await _context.Workspaces
                 .Include(w => w.Owner)
-                .Include(w => w.Notes)
-                .ThenInclude(n => n.Attachments)
+                .Include(w => w.Notes).ThenInclude(n => n.Attachments)
+                .Include(w => w.Projects).ThenInclude(p => p.PSNotes).ThenInclude(n => n.Attachments)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(w => w.ID == id && w.IsPublic);
             if (workspace == null) return NotFound();
-            return Ok(MapToDTO(workspace));
+            return Ok(MapWorkspace(workspace));
         }
-        private static WorkspaceDTO MapToDTO(Workspace w)
+        private static WorkspaceDTO MapWorkspace(Workspace w)
         {
             var noteDTOs = w.Notes
                 .Where(n => !(n is ProjectSpecificNote))
-                .Select(n => new NoteDTO(
-                    n.ID,
-                    n.Name,
-                    n.Content,
-                    (n.Attachments ?? new List<Attachment>())
+                .Select(MapNote)
+                .ToList();
+
+            var projectDTOs = w.Projects
+                .Select(p => new ProjectDTO(
+                    p.ID,
+                    p.Name,
+                    p.Description,
+                    p.PSNotes.Select(MapNote).ToList()
+                )).ToList();
+
+            return new WorkspaceDTO(w.ID, w.Name, w.Description, w.Owner.Email!, noteDTOs, projectDTOs);
+        }
+
+        private static NoteDTO MapNote(Note n) =>
+            new NoteDTO(
+                n.ID,
+                n.Name,
+                n.Content,
+                (n.Attachments ?? new List<Attachment>())
                     .Select(a => new AttachmentDTO(
                         a.ID, a.FileName, a.ContentType, a.FileSize, a.CreatedAt
                     )).ToList()
-                )).ToList();
-            return new WorkspaceDTO(w.ID, w.Name, w.Description, w.Owner.Email!, noteDTOs);
-        }
+            );
     }
 
 }

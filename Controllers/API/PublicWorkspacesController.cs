@@ -14,6 +14,7 @@ namespace goynote.Controllers.API
         public PublicWorkspacesController(IdentityDatabaseContext c) => _context = c;
 
         // GET /api/workspaces
+        [HttpGet]
         public async Task<ActionResult<IEnumerable<WorkspaceDTO>>> GetPublic()
         {
             var workspaces = await _context.Workspaces
@@ -27,6 +28,7 @@ namespace goynote.Controllers.API
         }
 
         // GET /api/workspaces/{id}
+        [HttpGet("{id:guid}")]
         public async Task<ActionResult<IEnumerable<WorkspaceDTO>>> GetPublicByID(Guid id)
         {
             var workspace = await _context.Workspaces

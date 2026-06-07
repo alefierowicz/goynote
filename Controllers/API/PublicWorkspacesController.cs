@@ -26,6 +26,17 @@ namespace goynote.Controllers.API
             return Ok(DTOs);
         }
 
+        // GET /api/workspaces/{id}
+        public async Task<ActionResult<IEnumerable<WorkspaceDTO>>> GetPublicByID(Guid id)
+        {
+            var workspace = await _context.Workspaces
+                .Include(w => w.Owner)
+                .Include(w => w.Notes)
+                .ThenInclude(n => n.Attachments)
+                .FirstOrDefaultAsync(w => w.ID == id && w.IsPublic);
+            if (workspace == null) return NotFound();
+            return Ok(MapToDTO(workspace));
+        }
         private static WorkspaceDTO MapToDTO(Workspace w)
         {
             var noteDTOs = w.Notes

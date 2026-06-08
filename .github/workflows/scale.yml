@@ -1,0 +1,38 @@
+name: Scale ECS Service
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Start or stop the service'
+        required: true
+        type: choice
+        options: [start, stop]
+
+env:
+  AWS_REGION: eu-central-1
+  ECS_CLUSTER: goynote-cluster
+  ECS_SERVICE: goynote-service
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  scale:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Set desired count
+        run: |
+          COUNT=${{ inputs.action == 'start' && '1' || '0' }}
+          aws ecs update-service \
+            --cluster "$ECS_CLUSTER" \
+            --service "$ECS_SERVICE" \
+            --desired-count $COUNT
+          echo "Service ${{ inputs.action }}ed (desired count: $COUNT)"

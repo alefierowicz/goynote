@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using goynote.Models.API;
 using goynote.Models.Objects;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace goynote.Controllers.API
 {
     [ApiController]
     [Route("api/workspaces")]
+    [Authorize]
     public class PublicWorkspacesController : ControllerBase
     {
         private readonly IdentityDatabaseContext _context;

@@ -28,6 +28,7 @@
     <PackageReference Include="NuGet.Protocol" Version="7.3.1" />
     <PackageReference Include="QuestPDF" Version="2026.5.0" />
     <PackageReference Include="QuestPDF.Markdown" Version="1.49.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.1" />
   </ItemGroup>
 
 </Project>

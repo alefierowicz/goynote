@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using goynote.Models.System;
 using Microsoft.AspNetCore.Identity;
+using System.Numerics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,9 @@ string? connectionString = builder.Configuration.GetConnectionString("GoynoteDB"
 builder.Services.AddDbContext<IdentityDatabaseContext>(o =>
     o.UseSqlite(connectionString ?? "Data Source=goynote.db")
 );
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<IdentityDatabaseContext>()
@@ -49,19 +53,26 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapStaticAssets();
+
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
+app.MapControllers();
 
 app.Run();
